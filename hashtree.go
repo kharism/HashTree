@@ -4,7 +4,6 @@ import(
 	//"fmt"
 	"strconv"
 )
-
 type HashNode struct{
 	Key int
 	Val int
@@ -32,6 +31,46 @@ func (c *HashNode) AddValueRecursive(key []int){
 		//fmt.Println("Node",c.Key,"Added",c.Val)
 		childNode.Val+=1
 	}
+}
+func (c *HashNode) AddValueWithoutCreate(key []int)error{
+	c.Val+=1
+	if len(key)==0{
+		return nil
+	}
+	childNode,ok:=c.Childs[key[0]]
+	if !ok{
+		return errors.New("No Key Error for Node"+strconv.Itoa(c.Key))
+	}
+	if len(key)>1{
+		childNode.AddValueWithoutCreate(key[1:])
+	} else if len(key)==1{
+		//fmt.Println("Node",c.Key,"Added",c.Val)
+		childNode.Val+=1
+	}
+	return nil
+}
+func (c *HashNode) AddNodeWithoutValue(key []int)error{
+	if len(key)==0{
+		return nil
+	}
+	childNode,ok:=c.Childs[key[0]]
+	if !ok{
+		//fmt.Println("Node",c.Key,"adding",key)
+		childNode = &HashNode{Key:key[0]}
+		if c.Childs==nil{
+			c.Childs = make(map[int]*HashNode)
+		}
+		
+		c.Childs[key[0]] = childNode
+		//fmt.Println("Adding ",len(c.Childs))
+	}
+	if len(key)>1{
+		childNode.AddNodeWithoutValue(key[1:])
+	} else if len(key)==1{
+		//fmt.Println("Node",c.Key,"Added",c.Val)
+		//childNode.Val+=1
+	}
+	return nil
 }
 func (c *HashNode) GetValueRecursive(key []int)(int,error){
 	if len(key)==0{
